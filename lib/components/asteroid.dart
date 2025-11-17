@@ -25,10 +25,14 @@ class Asteroid extends SpriteComponent
       : super(
           size: Vector2.all(size),
           anchor: Anchor.center,
+<<<<<<< HEAD
           // ++ MODIFIED ++
           // Priority 1 ensures it's above the ParallaxBackground (priority 0)
           // but below the player and HUD (priorities 2, 10, 11)
           priority: 1,
+=======
+          priority: -1,
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
         ) {
     _velocity = _generateVelocity();
     _originalVelocity.setFrom(_velocity);

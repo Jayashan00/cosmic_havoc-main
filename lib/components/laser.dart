@@ -4,7 +4,10 @@ import 'dart:math';
 
 import 'package:cosmic_havoc/components/asteroid.dart';
 import 'package:cosmic_havoc/components/enemy.dart';
+<<<<<<< HEAD
 import 'package:cosmic_havoc/components/fighter_ship.dart'; // ++ ADDED ++
+=======
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 import 'package:cosmic_havoc/components/player.dart';
 import 'package:cosmic_havoc/my_game.dart';
 import 'package:flame/collisions.dart';
@@ -23,9 +26,13 @@ class Laser extends SpriteComponent
     required this.laserType,
   }) : super(
           anchor: Anchor.center,
+<<<<<<< HEAD
           // ++ MODIFIED ++
           // Priority 1 to be above the background
           priority: 1,
+=======
+          priority: -1,
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
         );
 
   @override
@@ -41,7 +48,11 @@ class Laser extends SpriteComponent
   @override
   void update(double dt) {
     super.update(dt);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     double direction = laserType == LaserType.player ? -1 : 1;
     position += Vector2(sin(angle), cos(angle) * direction) * _speed * dt;
 
@@ -55,6 +66,7 @@ class Laser extends SpriteComponent
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
 
+<<<<<<< HEAD
     // ++ MODIFIED ++
     // Added check for FighterShip
     if (laserType == LaserType.player &&
@@ -64,6 +76,13 @@ class Laser extends SpriteComponent
     } else if (laserType == LaserType.enemy && other is Player) {
       // The onCollision in Player will handle taking damage
       // (The laser is removed in the Player's onCollisionStart)
+=======
+    if (laserType == LaserType.player && (other is Asteroid || other is Enemy)) {
+      removeFromParent();
+      // The onCollisionStart in Asteroid/Enemy will handle taking damage
+    } else if (laserType == LaserType.enemy && other is Player) {
+      // The onCollision in Player will handle taking damage
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     }
   }
 }

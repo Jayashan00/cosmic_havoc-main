@@ -22,11 +22,17 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
 
   Future<void> _loadHighScore() async {
     final score = await HighScoreManager.getHighScore();
+<<<<<<< HEAD
     if (mounted) {
       setState(() {
         _highScore = score;
       });
     }
+=======
+    setState(() {
+      _highScore = score;
+    });
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
   }
 
   @override
@@ -37,6 +43,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+<<<<<<< HEAD
             const Text('GAME OVER',
                 style: TextStyle(
                     color: Colors.white,
@@ -56,6 +63,11 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
             Text('High Score: $_highScore',
                 style: const TextStyle(color: Colors.white, fontSize: 24)),
 
+=======
+            const Text('GAME OVER', style: TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Text('High Score: $_highScore', style: const TextStyle(color: Colors.white, fontSize: 24)),
+>>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
             const SizedBox(height: 30),
             _buildButton('PLAY AGAIN', () => widget.game.restartGame()),
             const SizedBox(height: 15),
