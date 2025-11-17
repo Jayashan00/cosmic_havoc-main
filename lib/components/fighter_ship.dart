@@ -1,15 +1,14 @@
 // lib/components/fighter_ship.dart
 import 'dart:math';
+import 'package:cosmic_havoc/components/explosion.dart'; // ++ ADDED ++
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import '../my_game.dart';
 import 'laser.dart';
 
-// Now extends SpriteComponent directly to fix the 'sprite' error
 class FighterShip extends SpriteComponent
     with HasGameReference<MyGame>, CollisionCallbacks {
-
   final Random _random = Random();
   late Timer _laserTimer;
   double health = 2;
@@ -18,15 +17,15 @@ class FighterShip extends SpriteComponent
 
   FighterShip({required super.position})
       : super(
-          // The size is now removed from here, it will be set by the sprite
+          // ++ ADDED ++
+          // Set priority to 1 to draw above the background
+          priority: 1,
         );
 
   @override
   Future<void> onLoad() async {
-    // This now works because the class is a SpriteComponent
     sprite = await game.loadSprite('fighter_ship.png');
-    // Set the size after the sprite is loaded
-    size = sprite!.originalSize * 0.5; // You can adjust the 0.5 scale factor
+    size = sprite!.originalSize * 0.5;
     anchor = Anchor.center;
     add(RectangleHitbox());
 
@@ -49,6 +48,9 @@ class FighterShip extends SpriteComponent
     super.onCollisionStart(intersectionPoints, other);
     if (other is Laser && other.laserType == LaserType.player) {
       takeDamage(1);
+      // ++ ADDED ++
+      // Ensure the laser is removed on hit
+      other.removeFromParent();
     }
   }
 
@@ -59,9 +61,19 @@ class FighterShip extends SpriteComponent
     }
   }
 
+  // ++ MODIFIED ++
+  // Added explosion effect
   void die() {
     game.incrementScore(scoreValue);
-    // TODO: Add explosion effect
+
+    // Create an explosion
+    final Explosion explosion = Explosion(
+      position: position.clone(),
+      explosionSize: size.x * 1.2, // Make it a bit bigger than the ship
+      explosionType: ExplosionType.fire, // Fire explosion for enemies
+    );
+    game.add(explosion);
+
     removeFromParent();
   }
 
@@ -70,22 +82,26 @@ class FighterShip extends SpriteComponent
     super.update(dt);
     _laserTimer.update(dt);
 
-    // Also move down the screen slowly
     position.y += speed * dt;
     if (position.y > game.size.y) {
       removeFromParent();
     }
   }
 
+  // ++ MODIFIED ++
+  // Added sound effect
   void _fireLaser() {
-    // This check is now corrected to use 'game.paused'
     if (game.paused || !isMounted) return;
+
+    // ++ ADDED ++
+    game.audioManager.playSound('fire');
 
     final laser = Laser(
       position: position + Vector2(0, size.y / 2),
       laserType: LaserType.enemy,
     );
-    parent?.add(laser);
+    // Use game.add to ensure it has the correct parent
+    game.add(laser);
   }
 
   @override

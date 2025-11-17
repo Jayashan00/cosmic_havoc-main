@@ -33,17 +33,17 @@ class MyGame extends FlameGame
   int playerColorIndex = 0;
   late final AudioManager audioManager;
 
+  int get score => _score;
+
   @override
   FutureOr<void> onLoad() async {
     await Flame.device.fullScreen();
     await Flame.device.setPortrait();
-    
-    // Add parallax background instead of stars
+
     add(ParallaxBackground());
 
     audioManager = AudioManager();
     await add(audioManager);
-
 
     return super.onLoad();
   }
@@ -56,13 +56,12 @@ class MyGame extends FlameGame
 
     _waveManager = WaveManager();
     add(_waveManager);
-    
+
     _createPickupSpawner();
   }
 
   void _createHud() {
     _score = 0;
-    // Score display now on the right
     _scoreDisplay = TextComponent(
       text: '0',
       anchor: Anchor.topRight,
@@ -81,7 +80,8 @@ class MyGame extends FlameGame
   Future<void> _createPlayer() async {
     player = Player()
       ..anchor = Anchor.center
-      ..position = Vector2(size.x / 2, size.y * 0.8);
+      ..position = Vector2(size.x / 2, size.y * 0.8)
+      ..priority = 2;
     add(player);
   }
 
@@ -142,6 +142,29 @@ class MyGame extends FlameGame
     _scoreDisplay.add(popEffect);
   }
 
+  void showFloatingText(String text, Vector2 position,
+      {Color color = Colors.white}) {
+    final textComponent = TextComponent(
+      text: text,
+      position: position,
+      anchor: Anchor.center,
+      priority: 15,
+      textRenderer: TextPaint(
+        style: TextStyle(
+            color: color, fontSize: 24, fontWeight: FontWeight.bold),
+      ),
+    );
+    add(textComponent);
+
+    textComponent.add(
+      SequenceEffect([
+        MoveByEffect(Vector2(0, -50),
+            EffectController(duration: 1.5, curve: Curves.easeOut)),
+        RemoveEffect(delay: 1.5),
+      ]),
+    );
+  }
+
   void onPlayerHit() {
     _playerHealth.updateHealth(player.health);
   }
@@ -153,22 +176,20 @@ class MyGame extends FlameGame
   }
 
   void restartGame() {
-    // Remove all game components except the core managers
     children.whereType<PositionComponent>().forEach((component) {
       if (component is! ParallaxBackground && component is! AudioManager) {
         remove(component);
       }
     });
 
-    // Start a new game
     startGame();
-
     resumeEngine();
   }
 
   void quitGame() {
-    // Remove all game components except the core managers
     children.whereType<PositionComponent>().forEach((component) {
+      // ++ THIS IS THE FIX ++
+      // Corrected "ParaxBackground" to "ParallaxBackground"
       if (component is! ParallaxBackground && component is! AudioManager) {
         remove(component);
       }
@@ -179,7 +200,7 @@ class MyGame extends FlameGame
   }
 
   void shakeScreen() {
-    camera.viewfinder.add(
+    camera.viewfinder..add(
       MoveByEffect(
         Vector2(8, 8),
         EffectController(duration: 0.07, alternate: true, repeatCount: 2),

@@ -1,3 +1,4 @@
+// lib/components/bomb.dart
 import 'dart:async';
 
 import 'package:cosmic_havoc/components/asteroid.dart';
@@ -13,7 +14,9 @@ class Bomb extends SpriteComponent
       : super(
           size: Vector2.all(1),
           anchor: Anchor.center,
-          priority: -1,
+          // ++ MODIFIED ++
+          // Priority 2 to be above other game elements
+          priority: 2, 
         );
 
   @override

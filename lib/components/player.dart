@@ -1,11 +1,12 @@
 // lib/components/player.dart
-import 'dart:async';
-import 'dart:math';
-import 'dart:ui';
+import 'dart:async'; // <-- CORRECTED
+import 'dart:math'; // <-- CORRECTED
+import 'dart:ui'; // <-- CORRECTED
 import 'package:cosmic_havoc/components/asteroid.dart';
 import 'package:cosmic_havoc/components/bomb.dart';
 import 'package:cosmic_havoc/components/enemy.dart';
 import 'package:cosmic_havoc/components/explosion.dart';
+import 'package:cosmic_havoc/components/fighter_ship.dart';
 import 'package:cosmic_havoc/components/laser.dart';
 import 'package:cosmic_havoc/components/pickup.dart';
 import 'package:cosmic_havoc/components/shield.dart';
@@ -18,7 +19,7 @@ import 'package:flutter/services.dart';
 class Player extends SpriteAnimationComponent
     with HasGameReference<MyGame>, KeyboardHandler, CollisionCallbacks {
   bool _isShooting = false;
-  final double _fireCooldown = 0.2;
+  double _fireCooldown = 0.2; // Changed for level-up
   double _elapsedFireTime = 0.0;
   final Vector2 _keyboardMovement = Vector2.zero();
   bool _isDestroyed = false;
@@ -47,6 +48,16 @@ class Player extends SpriteAnimationComponent
     size *= 0.3;
     add(RectangleHitbox.relative(Vector2(0.6, 0.9),
         parentSize: size, anchor: Anchor.center));
+
+    _isInvulnerable = true;
+    _invulnerabilityTimer.start();
+    add(
+      OpacityEffect.to(
+        0.5,
+        EffectController(duration: 0.1, alternate: true, repeatCount: 15),
+      ),
+    );
+
     return super.onLoad();
   }
 
@@ -61,14 +72,26 @@ class Player extends SpriteAnimationComponent
     _laserPowerupTimer.update(dt);
 
     final Vector2 movement = game.joystick.relativeDelta + _keyboardMovement;
-    position += movement.normalized() * 300 * dt; // Increased speed slightly
+    position += movement.normalized() * 300 * dt;
 
     _handleScreenBounds();
+    _updateFireRate(); // Feature: Level-up
 
     _elapsedFireTime += dt;
     if (_isShooting && _elapsedFireTime >= _fireCooldown) {
       _fireLaser();
       _elapsedFireTime = 0.0;
+    }
+  }
+
+  // Feature: Level-up logic
+  void _updateFireRate() {
+    if (game.score >= 200) {
+      _fireCooldown = 0.12; // Level 3 speed
+    } else if (game.score >= 100) {
+      _fireCooldown = 0.15; // Level 2 speed
+    } else if (game.score >= 50) {
+      _fireCooldown = 0.18; // Level 1 speed
     }
   }
 
@@ -92,15 +115,13 @@ class Player extends SpriteAnimationComponent
   }
 
   void _handleDestruction() async {
-    // ... inside _handleDestruction method
     if (_isDestroyed) return;
     _isDestroyed = true;
 
-    // This is the correct way to disable collisions
     remove(children.whereType<RectangleHitbox>().first);
 
     _explosionTimer.start();
-    // ...
+
     animation = SpriteAnimation.spriteList(
         [await game.loadSprite('player_${_color}_off.png')],
         stepTime: double.infinity);
@@ -117,7 +138,7 @@ class Player extends SpriteAnimationComponent
     super.onCollisionStart(intersectionPoints, other);
     if (_isDestroyed) return;
 
-    if (other is Asteroid || other is Enemy) {
+    if (other is Asteroid || other is Enemy || other is FighterShip) {
       takeHit();
     } else if (other is Laser && other.laserType == LaserType.enemy) {
       other.removeFromParent();
@@ -153,6 +174,7 @@ class Player extends SpriteAnimationComponent
     final double screenWidth = game.size.x;
     final double screenHeight = game.size.y;
     position.y =
+        // This line is now fixed
         clampDouble(position.y, size.y / 2, screenHeight - size.y / 2);
     if (position.x < 0) {
       position.x = screenWidth;
