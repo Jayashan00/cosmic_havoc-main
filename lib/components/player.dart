@@ -1,21 +1,11 @@
-// lib/components/player.dart
-<<<<<<< HEAD
-import 'dart:async'; // <-- CORRECTED
-import 'dart:math'; // <-- CORRECTED
-import 'dart:ui'; // <-- CORRECTED
-=======
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 import 'package:cosmic_havoc/components/asteroid.dart';
 import 'package:cosmic_havoc/components/bomb.dart';
 import 'package:cosmic_havoc/components/enemy.dart';
 import 'package:cosmic_havoc/components/explosion.dart';
-<<<<<<< HEAD
 import 'package:cosmic_havoc/components/fighter_ship.dart';
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 import 'package:cosmic_havoc/components/laser.dart';
 import 'package:cosmic_havoc/components/pickup.dart';
 import 'package:cosmic_havoc/components/shield.dart';
@@ -28,11 +18,7 @@ import 'package:flutter/services.dart';
 class Player extends SpriteAnimationComponent
     with HasGameReference<MyGame>, KeyboardHandler, CollisionCallbacks {
   bool _isShooting = false;
-<<<<<<< HEAD
-  double _fireCooldown = 0.2; // Changed for level-up
-=======
-  final double _fireCooldown = 0.2;
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
+  double _fireCooldown = 0.2;
   double _elapsedFireTime = 0.0;
   final Vector2 _keyboardMovement = Vector2.zero();
   bool _isDestroyed = false;
@@ -61,7 +47,6 @@ class Player extends SpriteAnimationComponent
     size *= 0.3;
     add(RectangleHitbox.relative(Vector2(0.6, 0.9),
         parentSize: size, anchor: Anchor.center));
-<<<<<<< HEAD
 
     _isInvulnerable = true;
     _invulnerabilityTimer.start();
@@ -72,8 +57,6 @@ class Player extends SpriteAnimationComponent
       ),
     );
 
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     return super.onLoad();
   }
 
@@ -88,16 +71,10 @@ class Player extends SpriteAnimationComponent
     _laserPowerupTimer.update(dt);
 
     final Vector2 movement = game.joystick.relativeDelta + _keyboardMovement;
-<<<<<<< HEAD
     position += movement.normalized() * 300 * dt;
 
     _handleScreenBounds();
-    _updateFireRate(); // Feature: Level-up
-=======
-    position += movement.normalized() * 300 * dt; // Increased speed slightly
-
-    _handleScreenBounds();
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
+    _updateFireRate();
 
     _elapsedFireTime += dt;
     if (_isShooting && _elapsedFireTime >= _fireCooldown) {
@@ -106,20 +83,16 @@ class Player extends SpriteAnimationComponent
     }
   }
 
-<<<<<<< HEAD
-  // Feature: Level-up logic
   void _updateFireRate() {
     if (game.score >= 200) {
-      _fireCooldown = 0.12; // Level 3 speed
+      _fireCooldown = 0.12;
     } else if (game.score >= 100) {
-      _fireCooldown = 0.15; // Level 2 speed
+      _fireCooldown = 0.15;
     } else if (game.score >= 50) {
-      _fireCooldown = 0.18; // Level 1 speed
+      _fireCooldown = 0.18;
     }
   }
 
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
   void takeHit() {
     if (_isInvulnerable || activeShield != null || _isDestroyed) return;
 
@@ -140,7 +113,6 @@ class Player extends SpriteAnimationComponent
   }
 
   void _handleDestruction() async {
-<<<<<<< HEAD
     if (_isDestroyed) return;
     _isDestroyed = true;
 
@@ -148,17 +120,6 @@ class Player extends SpriteAnimationComponent
 
     _explosionTimer.start();
 
-=======
-    // ... inside _handleDestruction method
-    if (_isDestroyed) return;
-    _isDestroyed = true;
-
-    // This is the correct way to disable collisions
-    remove(children.whereType<RectangleHitbox>().first);
-
-    _explosionTimer.start();
-    // ...
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     animation = SpriteAnimation.spriteList(
         [await game.loadSprite('player_${_color}_off.png')],
         stepTime: double.infinity);
@@ -175,11 +136,7 @@ class Player extends SpriteAnimationComponent
     super.onCollisionStart(intersectionPoints, other);
     if (_isDestroyed) return;
 
-<<<<<<< HEAD
     if (other is Asteroid || other is Enemy || other is FighterShip) {
-=======
-    if (other is Asteroid || other is Enemy) {
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
       takeHit();
     } else if (other is Laser && other.laserType == LaserType.enemy) {
       other.removeFromParent();
@@ -215,10 +172,6 @@ class Player extends SpriteAnimationComponent
     final double screenWidth = game.size.x;
     final double screenHeight = game.size.y;
     position.y =
-<<<<<<< HEAD
-        // This line is now fixed
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
         clampDouble(position.y, size.y / 2, screenHeight - size.y / 2);
     if (position.x < 0) {
       position.x = screenWidth;

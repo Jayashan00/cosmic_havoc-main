@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// lib/components/pickup.dart
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 import 'dart:async';
 
 import 'package:cosmic_havoc/my_game.dart';
@@ -16,17 +12,11 @@ class Pickup extends SpriteComponent with HasGameReference<MyGame> {
   final PickupType pickupType;
 
   Pickup({required super.position, required this.pickupType})
-<<<<<<< HEAD
       : super(
           size: Vector2.all(100), 
           anchor: Anchor.center,
-          // ++ ADDED ++
-          // Priority 1 to be above the background
           priority: 1,
         );
-=======
-      : super(size: Vector2.all(100), anchor: Anchor.center);
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 
   @override
   FutureOr<void> onLoad() async {
@@ -54,13 +44,8 @@ class Pickup extends SpriteComponent with HasGameReference<MyGame> {
 
     position.y += 300 * dt;
 
-    // remove the pickup from the game if it goes below the bottom
     if (position.y > game.size.y + size.y / 2) {
       removeFromParent();
     }
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d

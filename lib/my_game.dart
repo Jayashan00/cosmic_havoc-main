@@ -33,30 +33,18 @@ class MyGame extends FlameGame
   int playerColorIndex = 0;
   late final AudioManager audioManager;
 
-<<<<<<< HEAD
   int get score => _score;
 
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
   @override
   FutureOr<void> onLoad() async {
     await Flame.device.fullScreen();
     await Flame.device.setPortrait();
-<<<<<<< HEAD
 
-=======
-    
-    // Add parallax background instead of stars
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     add(ParallaxBackground());
 
     audioManager = AudioManager();
     await add(audioManager);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     return super.onLoad();
   }
 
@@ -68,20 +56,12 @@ class MyGame extends FlameGame
 
     _waveManager = WaveManager();
     add(_waveManager);
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     _createPickupSpawner();
   }
 
   void _createHud() {
     _score = 0;
-<<<<<<< HEAD
-=======
-    // Score display now on the right
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     _scoreDisplay = TextComponent(
       text: '0',
       anchor: Anchor.topRight,
@@ -100,12 +80,8 @@ class MyGame extends FlameGame
   Future<void> _createPlayer() async {
     player = Player()
       ..anchor = Anchor.center
-<<<<<<< HEAD
       ..position = Vector2(size.x / 2, size.y * 0.8)
       ..priority = 2;
-=======
-      ..position = Vector2(size.x / 2, size.y * 0.8);
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     add(player);
   }
 
@@ -166,7 +142,6 @@ class MyGame extends FlameGame
     _scoreDisplay.add(popEffect);
   }
 
-<<<<<<< HEAD
   void showFloatingText(String text, Vector2 position,
       {Color color = Colors.white}) {
     final textComponent = TextComponent(
@@ -190,48 +165,33 @@ class MyGame extends FlameGame
     );
   }
 
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
   void onPlayerHit() {
     _playerHealth.updateHealth(player.health);
   }
 
+  // ++ MODIFIED ++
+  // Added a check to prevent the Game Over screen from opening twice
   void playerDied() {
+    if (overlays.isActive('GameOver')) return;
+
     HighScoreManager.saveHighScore(_score);
     overlays.add('GameOver');
     pauseEngine();
   }
 
   void restartGame() {
-<<<<<<< HEAD
-=======
-    // Remove all game components except the core managers
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     children.whereType<PositionComponent>().forEach((component) {
       if (component is! ParallaxBackground && component is! AudioManager) {
         remove(component);
       }
     });
 
-<<<<<<< HEAD
     startGame();
-=======
-    // Start a new game
-    startGame();
-
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
     resumeEngine();
   }
 
   void quitGame() {
-<<<<<<< HEAD
     children.whereType<PositionComponent>().forEach((component) {
-      // ++ THIS IS THE FIX ++
-      // Corrected "ParaxBackground" to "ParallaxBackground"
-=======
-    // Remove all game components except the core managers
-    children.whereType<PositionComponent>().forEach((component) {
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
       if (component is! ParallaxBackground && component is! AudioManager) {
         remove(component);
       }
@@ -242,11 +202,7 @@ class MyGame extends FlameGame
   }
 
   void shakeScreen() {
-<<<<<<< HEAD
-    camera.viewfinder..add(
-=======
     camera.viewfinder.add(
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
       MoveByEffect(
         Vector2(8, 8),
         EffectController(duration: 0.07, alternate: true, repeatCount: 2),

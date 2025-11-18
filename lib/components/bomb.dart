@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// lib/components/bomb.dart
-=======
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
 import 'dart:async';
 
 import 'package:cosmic_havoc/components/asteroid.dart';
@@ -17,13 +13,7 @@ class Bomb extends SpriteComponent
       : super(
           size: Vector2.all(1),
           anchor: Anchor.center,
-<<<<<<< HEAD
-          // ++ MODIFIED ++
-          // Priority 2 to be above other game elements
           priority: 2, 
-=======
-          priority: -1,
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
         );
 
   @override
@@ -59,8 +49,4 @@ class Bomb extends SpriteComponent
       other.takeDamage();
     }
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d

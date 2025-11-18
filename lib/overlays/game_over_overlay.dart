@@ -22,17 +22,11 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
 
   Future<void> _loadHighScore() async {
     final score = await HighScoreManager.getHighScore();
-<<<<<<< HEAD
     if (mounted) {
       setState(() {
         _highScore = score;
       });
     }
-=======
-    setState(() {
-      _highScore = score;
-    });
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
   }
 
   @override
@@ -40,59 +34,81 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
     return Material(
       color: Colors.black.withAlpha(150),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-<<<<<<< HEAD
-            const Text('GAME OVER',
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'GAME OVER',
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+                  color: Colors.redAccent,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                ),
+              ),
+              const SizedBox(height: 20),
 
-            // ++ ADDED ++
-            // Display the score from the run that just ended
-            Text('Your Score: ${widget.game.score}',
-                style: const TextStyle(color: Colors.white, fontSize: 24)),
+              Text(
+                'Score: ${widget.game.score}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
-            // ++ MODIFIED ++
-            // Now correctly shows the all-time high score
-            Text('High Score: $_highScore',
-                style: const TextStyle(color: Colors.white, fontSize: 24)),
+              Text(
+                'High Score: $_highScore',
+                style: const TextStyle(
+                  color: Colors.yellow,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold
+                ),
+              ),
 
-=======
-            const Text('GAME OVER', style: TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            Text('High Score: $_highScore', style: const TextStyle(color: Colors.white, fontSize: 24)),
->>>>>>> 9af76411c8d8ea673107c35d8fea354f8d753e1d
-            const SizedBox(height: 30),
-            _buildButton('PLAY AGAIN', () => widget.game.restartGame()),
-            const SizedBox(height: 15),
-            _buildButton('QUIT GAME', () => widget.game.quitGame()),
-          ],
+              const SizedBox(height: 30),
+              _buildButton('PLAY AGAIN', () => widget.game.restartGame()),
+              const SizedBox(height: 15),
+              _buildButton('QUIT GAME', () => widget.game.quitGame()),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildButton(String label, VoidCallback onPressed) {
-    return TextButton(
-      onPressed: () {
-        widget.game.audioManager.playSound('click');
-        onPressed();
-        if (mounted) {
-          widget.game.overlays.remove('GameOver');
-        }
-      },
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-        backgroundColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+    return SizedBox(
+      width: 200,
+      child: ElevatedButton(
+        onPressed: () {
+          widget.game.audioManager.playSound('click');
+          onPressed();
+          if (mounted) {
+            widget.game.overlays.remove('GameOver');
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+          elevation: 5,
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
+        ),
       ),
-      child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 28)),
     );
   }
 }
