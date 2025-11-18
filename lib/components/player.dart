@@ -6,9 +6,11 @@ import 'package:cosmic_havoc/components/bomb.dart';
 import 'package:cosmic_havoc/components/enemy.dart';
 import 'package:cosmic_havoc/components/explosion.dart';
 import 'package:cosmic_havoc/components/fighter_ship.dart';
+import 'package:cosmic_havoc/components/boss.dart'; // ++ ADDED ++
 import 'package:cosmic_havoc/components/laser.dart';
 import 'package:cosmic_havoc/components/pickup.dart';
 import 'package:cosmic_havoc/components/shield.dart';
+import 'package:cosmic_havoc/components/engine_trail.dart'; // ++ ADDED ++
 import 'package:cosmic_havoc/my_game.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -56,6 +58,9 @@ class Player extends SpriteAnimationComponent
         EffectController(duration: 0.1, alternate: true, repeatCount: 15),
       ),
     );
+
+    // ++ ADDED: Engine Trail ++
+    parent?.add(EngineTrail(parent: this, isEnemy: false));
 
     return super.onLoad();
   }
@@ -136,7 +141,8 @@ class Player extends SpriteAnimationComponent
     super.onCollisionStart(intersectionPoints, other);
     if (_isDestroyed) return;
 
-    if (other is Asteroid || other is Enemy || other is FighterShip) {
+    // ++ MODIFIED: Added Boss Check ++
+    if (other is Asteroid || other is Enemy || other is FighterShip || other is Boss) {
       takeHit();
     } else if (other is Laser && other.laserType == LaserType.enemy) {
       other.removeFromParent();

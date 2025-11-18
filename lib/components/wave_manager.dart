@@ -6,6 +6,7 @@ import 'package:cosmic_havoc/my_game.dart';
 import 'package:cosmic_havoc/components/enemy.dart';
 import 'package:cosmic_havoc/components/asteroid.dart';
 import 'package:cosmic_havoc/components/fighter_ship.dart';
+import 'package:cosmic_havoc/components/boss.dart'; // ++ ADDED ++
 
 class WaveManager extends Component with HasGameReference<MyGame> {
   int currentWave = 0;
@@ -23,8 +24,10 @@ class WaveManager extends Component with HasGameReference<MyGame> {
     super.update(dt);
     _waveTimer.update(dt);
 
+    // ++ MODIFIED: Check for Boss as well ++
     if (game.children.whereType<Asteroid>().isEmpty &&
         game.children.whereType<FighterShip>().isEmpty &&
+        game.children.whereType<Boss>().isEmpty &&
         !_waveTimer.isRunning()) {
 
       if (currentWave > 0) {
@@ -43,6 +46,24 @@ class WaveManager extends Component with HasGameReference<MyGame> {
   }
 
   void spawnWave(int waveNumber) {
+    // ++ ADDED: Boss Battle every 5th wave ++
+    if (waveNumber % 5 == 0) {
+      game.showFloatingText("BOSS BATTLE!", game.size / 2, color: Colors.red);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (game.isMounted && !game.paused) {
+          game.add(Boss(position: Vector2(game.size.x / 2, -100)));
+        }
+      });
+      // Spawn some supporting asteroids
+      for (int i = 0; i < 3; i++) {
+         Future.delayed(Duration(seconds: 3 + i), () {
+           game.add(Asteroid(position: game.generateSpawnPosition()));
+         });
+      }
+      return; // Don't spawn normal wave logic
+    }
+
+    // Normal Wave Logic
     int asteroidCount = 2 + waveNumber;
     for (int i = 0; i < asteroidCount; i++) {
       Future.delayed(Duration(milliseconds: _random.nextInt(5000) + 1000), () {

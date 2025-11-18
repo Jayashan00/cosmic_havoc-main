@@ -7,7 +7,7 @@ import 'package:cosmic_havoc/my_game.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart'; // ++ ADDED for Colors ++
 
 class Asteroid extends SpriteComponent
     with HasGameReference<MyGame>, CollisionCallbacks {
@@ -45,6 +45,9 @@ class Asteroid extends SpriteComponent
   void takeDamage() {
     game.audioManager.playSound('hit');
     _health--;
+
+    // ++ ADDED: Damage Text ++
+    game.showDamageText("1", position.clone(), Colors.grey);
 
     if (_health <= 0) {
       game.shakeScreen();

@@ -1,8 +1,10 @@
 import 'dart:math';
+import 'package:cosmic_havoc/components/engine_trail.dart'; // ++ ADDED ++
 import 'package:cosmic_havoc/components/explosion.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter/material.dart'; // ++ ADDED for colors ++
 import '../my_game.dart';
 import 'laser.dart';
 
@@ -38,6 +40,9 @@ class FighterShip extends SpriteComponent
         EffectController(duration: 4, alternate: true, infinite: true),
       ),
     );
+
+    // ++ ADDED: Engine Trail ++
+    parent?.add(EngineTrail(parent: this, isEnemy: true));
   }
 
   @override
@@ -51,6 +56,9 @@ class FighterShip extends SpriteComponent
 
   void takeDamage(double damage) {
     health -= damage;
+    // ++ ADDED: Damage Text ++
+    game.showDamageText("1", position.clone(), Colors.orange);
+
     if (health <= 0) {
       die();
     }

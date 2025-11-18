@@ -1,4 +1,3 @@
-// lib/my_game.dart
 import 'dart:async';
 import 'dart:math';
 
@@ -8,6 +7,7 @@ import 'package:cosmic_havoc/components/pickup.dart';
 import 'package:cosmic_havoc/components/player.dart';
 import 'package:cosmic_havoc/components/player_health.dart';
 import 'package:cosmic_havoc/components/shoot_button.dart';
+import 'package:cosmic_havoc/components/pause_button.dart';
 import 'package:cosmic_havoc/components/parallax_background.dart';
 import 'package:cosmic_havoc/components/wave_manager.dart';
 import 'package:cosmic_havoc/utils/highscore_manager.dart';
@@ -26,12 +26,17 @@ class MyGame extends FlameGame
   late WaveManager _waveManager;
   final Random _random = Random();
   late ShootButton _shootButton;
+  late PauseButton _pauseButton;
   int _score = 0;
   late TextComponent _scoreDisplay;
+  late TextComponent _comboDisplay;
   late PlayerHealth _playerHealth;
   final List<String> playerColors = ['blue', 'red', 'green', 'purple'];
   int playerColorIndex = 0;
   late final AudioManager audioManager;
+
+  late RectangleComponent _flashScreen;
+  int _combo = 0;
 
   int get score => _score;
 
@@ -54,14 +59,26 @@ class MyGame extends FlameGame
     _createHud();
     _createShootButton();
 
+    _pauseButton = PauseButton()..priority = 10;
+    add(_pauseButton);
+
     _waveManager = WaveManager();
     add(_waveManager);
 
     _createPickupSpawner();
+
+    // Initialize flash screen as transparent
+    _flashScreen = RectangleComponent(
+      size: size,
+      paint: Paint()..color = Colors.red.withOpacity(0.0),
+      priority: 5,
+    );
+    add(_flashScreen);
   }
 
   void _createHud() {
     _score = 0;
+    _combo = 0;
     _scoreDisplay = TextComponent(
       text: '0',
       anchor: Anchor.topRight,
@@ -72,6 +89,17 @@ class MyGame extends FlameGame
       ),
     );
     add(_scoreDisplay);
+
+    _comboDisplay = TextComponent(
+      text: '',
+      anchor: Anchor.topRight,
+      position: Vector2(size.x - 20, 60),
+      priority: 11,
+      textRenderer: TextPaint(
+        style: const TextStyle(color: Colors.yellow, fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+    );
+    add(_comboDisplay);
 
     _playerHealth = PlayerHealth();
     add(_playerHealth);
@@ -132,14 +160,29 @@ class MyGame extends FlameGame
   }
 
   void incrementScore(int amount) {
-    _score += amount;
+    _combo++;
+    int bonus = 0;
+    if (_combo > 5) bonus = _combo * 2;
+
+    _score += amount + bonus;
     _scoreDisplay.text = _score.toString();
+
+    if (_combo > 1) {
+      _comboDisplay.text = 'COMBO x$_combo';
+    } else {
+      _comboDisplay.text = '';
+    }
 
     final popEffect = ScaleEffect.to(
       Vector2.all(1.2),
       EffectController(duration: 0.1, alternate: true),
     );
     _scoreDisplay.add(popEffect);
+  }
+
+  void resetCombo() {
+    _combo = 0;
+    _comboDisplay.text = '';
   }
 
   void showFloatingText(String text, Vector2 position,
@@ -151,29 +194,78 @@ class MyGame extends FlameGame
       priority: 15,
       textRenderer: TextPaint(
         style: TextStyle(
-            color: color, fontSize: 24, fontWeight: FontWeight.bold),
+            color: color, fontSize: 24, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 10, color: color)]),
       ),
     );
     add(textComponent);
 
+    // Simplified effect: Float up, then remove. No opacity fade.
     textComponent.add(
       SequenceEffect([
         MoveByEffect(Vector2(0, -50),
             EffectController(duration: 1.5, curve: Curves.easeOut)),
-        RemoveEffect(delay: 1.5),
+        RemoveEffect(),
       ]),
     );
   }
 
-  void onPlayerHit() {
-    _playerHealth.updateHealth(player.health);
+  void showDamageText(String text, Vector2 position, Color color) {
+    final textComponent = TextComponent(
+      text: text,
+      position: position,
+      anchor: Anchor.center,
+      priority: 15,
+      textRenderer: TextPaint(
+        style: TextStyle(
+            color: color, fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+    add(textComponent);
+
+    // Simplified effect: Float up quickly, then remove. No opacity fade.
+    textComponent.add(
+      SequenceEffect([
+        MoveByEffect(
+          Vector2(0, -30),
+          EffectController(duration: 0.5, curve: Curves.easeOut)
+        ),
+        RemoveEffect(),
+      ]),
+    );
   }
 
-  // ++ MODIFIED ++
-  // Added a check to prevent the Game Over screen from opening twice
+  void triggerScreenFlash() {
+    // Manual flash without using OpacityEffect to avoid crash
+    _flashScreen.paint.color = Colors.red.withOpacity(0.5);
+
+    // Turn it off after 100ms
+    add(TimerComponent(
+      period: 0.1,
+      removeOnFinish: true,
+      onTick: () {
+        _flashScreen.paint.color = Colors.red.withOpacity(0.0);
+      }
+    ));
+  }
+
+  void togglePause() {
+    if (paused) {
+      resumeEngine();
+      overlays.remove('PauseMenu');
+    } else {
+      pauseEngine();
+      overlays.add('PauseMenu');
+    }
+  }
+
+  void onPlayerHit() {
+    _playerHealth.updateHealth(player.health);
+    triggerScreenFlash();
+    resetCombo();
+  }
+
   void playerDied() {
     if (overlays.isActive('GameOver')) return;
-
     HighScoreManager.saveHighScore(_score);
     overlays.add('GameOver');
     pauseEngine();
@@ -185,6 +277,7 @@ class MyGame extends FlameGame
         remove(component);
       }
     });
+    if (children.contains(_flashScreen)) remove(_flashScreen);
 
     startGame();
     resumeEngine();
